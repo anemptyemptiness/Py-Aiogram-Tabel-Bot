@@ -1,4 +1,3 @@
-from typing import Union
 from datetime import datetime
 
 from aiogram import Router, F

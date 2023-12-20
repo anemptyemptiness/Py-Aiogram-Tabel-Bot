@@ -7,13 +7,14 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import default_state
 from aiogram.fsm.context import FSMContext
 
-from main import config
+import db
 from fsm.fsm import FSMStartShift
 from keyboards.reply_markup_kb import create_yes_no_kb, create_cancel_kb, create_places_kb
 from middlewares.album_middleware import AlbumsMiddleware
 from lexicon.lexicon_ru import LEXICON_RU
 from filters.check_user import CheckUserFilter
 from filters.check_chat import CheckChatFilter
+from config.config import config
 
 router_start_shift = Router()
 router_start_shift.message.middleware(middleware=AlbumsMiddleware(2))
@@ -41,6 +42,20 @@ async def warning_chat(message: Message):
 @router_start_shift.message(CheckUserFilter(config.employees))
 async def warning_user(message: Message):
     await message.answer(text="Вас нет в списке работников данной компании")
+
+
+@router_start_shift.message(Command(commands="start"), StateFilter(default_state))
+async def process_command_start(message: Message):
+    if not db.DB.user_exists(message.from_user.id):
+        db.DB.add_users(
+            user_id=message.from_user.id,
+            date=datetime.now().strftime("%d/%m/%Y"),
+            active=1
+        )
+
+        await message.answer(text="Добро пожаловать!")
+    else:
+        await message.answer(text="Вы уже зарегистрированы в боте!")
 
 
 @router_start_shift.message(~StateFilter(default_state), F.text == "Отмена")
