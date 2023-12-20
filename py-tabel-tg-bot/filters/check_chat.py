@@ -7,4 +7,4 @@ class CheckChatFilter(BaseFilter):
         self.chat_ids = chat_ids
 
     async def __call__(self, message: Message) -> bool:
-        return message.chat.id not in self.chat_ids
+        return not str(message.chat.id) not in self.chat_ids

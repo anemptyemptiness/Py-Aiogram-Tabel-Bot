@@ -97,13 +97,18 @@ async def process_attracts_command_no(message: Message, state: FSMContext):
     day_of_week = datetime.now().strftime('%A')
     date = datetime.now().strftime(f'%d/%m/%Y - {LEXICON_RU[day_of_week]}')
 
-    await message.bot.send_message(chat_id="-1002034135560",
-                                   text=await report(check_attractions_dict, date=date),
-                                   parse_mode="html")
+    try:
+        await message.bot.send_message(chat_id="-1002034135560",
+                                       text=await report(check_attractions_dict, date=date),
+                                       parse_mode="html")
 
-    await message.answer(text="Отлично, отчёт сформирован...\nОтправляю начальству!",
-                         reply_markup=ReplyKeyboardRemove())
-    await state.clear()
+        await message.answer(text="Отлично, отчёт сформирован...\nОтправляю начальству!",
+                             reply_markup=ReplyKeyboardRemove())
+    except Exception as e:
+        print("Check attractions report error:", e)
+        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
+    finally:
+        await state.clear()
 
 
 @router_attractions.message(StateFilter(FSMAttractionsCheck.attracts))
@@ -120,13 +125,18 @@ async def process_defects_on_attracts_command(message: Message, state: FSMContex
     day_of_week = datetime.now().strftime('%A')
     date = datetime.now().strftime(f'%d/%m/%Y - {LEXICON_RU[day_of_week]}')
 
-    await message.bot.send_message(chat_id="-1002034135560",
-                                   text=await report(check_attractions_dict, date=date),
-                                   parse_mode="html")
+    try:
+        await message.bot.send_message(chat_id="-1002034135560",
+                                       text=await report(check_attractions_dict, date=date),
+                                       parse_mode="html")
 
-    await message.answer(text="Отлично, отчёт сформирован...\nОтправляю начальству!",
-                         reply_markup=ReplyKeyboardRemove())
-    await state.clear()
+        await message.answer(text="Отлично, отчёт сформирован...\nОтправляю начальству!",
+                             reply_markup=ReplyKeyboardRemove())
+    except Exception as e:
+        print("Check attractions report error:", e)
+        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
+    finally:
+        await state.clear()
 
 
 @router_attractions.message(StateFilter(FSMAttractionsCheck.defects_on_attracts))

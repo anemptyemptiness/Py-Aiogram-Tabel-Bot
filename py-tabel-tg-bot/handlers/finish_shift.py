@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.filters import StateFilter, Command
 
+import db
 from fsm.fsm import FSMFinishShift
 from lexicon.lexicon_ru import LEXICON_RU
 from keyboards.reply_markup_kb import create_cancel_kb, create_yes_no_kb, create_places_kb
@@ -262,28 +263,39 @@ async def process_charge_video_command(message: Message, state: FSMContext):
                              reply_markup=ReplyKeyboardRemove())
 
         day_of_week = datetime.now().strftime('%A')
-        date = datetime.now().strftime(f'%d/%m/%Y - {LEXICON_RU[day_of_week]}')
+        date = datetime.now().strftime(f'%d-%m-%Y - {LEXICON_RU[day_of_week]}')
 
-        if 'photo_of_beneficiaries' in finish_shift_dict:
-            media_beneficiaries = [InputMediaPhoto(media=photo_file_id,
-                                                   caption="Фото льготников" if i == 0 else "")
-                                   for i, photo_file_id in enumerate(finish_shift_dict['photo_of_beneficiaries'])]
+        try:
+            if 'photo_of_beneficiaries' in finish_shift_dict:
+                media_beneficiaries = [InputMediaPhoto(media=photo_file_id,
+                                                       caption="Фото льготников" if i == 0 else "")
+                                       for i, photo_file_id in enumerate(finish_shift_dict['photo_of_beneficiaries'])]
+                await message.bot.send_media_group(chat_id="-1002034135560",
+                                                   media=media_beneficiaries)
+
+            media_necessary = [InputMediaPhoto(media=photo_file_id,
+                                               caption="Чеки и необходимые фото за смену" if i == 0 else "")
+                               for i, photo_file_id in enumerate(finish_shift_dict['necessary_photos'])]
+
+            await message.bot.send_message(chat_id="-1002034135560",
+                                           text=await report(finish_shift_dict, date=date))
             await message.bot.send_media_group(chat_id="-1002034135560",
-                                               media=media_beneficiaries)
+                                               media=media_necessary)
+            await message.bot.send_video(chat_id="-1002034135560",
+                                         video=finish_shift_dict['charge_video'],
+                                         caption="Видео аккумулятора и внешнего вида поезда")
 
-        media_necessary = [InputMediaPhoto(media=photo_file_id,
-                                           caption="Чеки и необходимые фото за смену" if i == 0 else "")
-                           for i, photo_file_id in enumerate(finish_shift_dict['necessary_photos'])]
-
-        await message.bot.send_message(chat_id="-1002034135560",
-                                       text=await report(finish_shift_dict, date=date))
-        await message.bot.send_media_group(chat_id="-1002034135560",
-                                           media=media_necessary)
-        await message.bot.send_video(chat_id="-1002034135560",
-                                     video=finish_shift_dict['charge_video'],
-                                     caption="Видео аккумулятора и внешнего вида поезда")
-
-        await state.clear()
+            db.DB.set_data(
+                date=datetime.now().strftime("%Y-%m-%d"),
+                name=finish_shift_dict['name'],
+                place=finish_shift_dict['place'],
+                count=finish_shift_dict['visitors']
+            )
+        except Exception as e:
+            print("Finish shift report error:", e)
+            await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
+        finally:
+            await state.clear()
 
     else:
         await message.answer(text="Это не похоже на видео, прикрепите видео аккумулятора и внешнего вида поезда!",

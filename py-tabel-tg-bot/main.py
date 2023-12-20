@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 import db
 from config.config import config
-from handlers import start_shift, encashment, check_attractions, finish_shift
+from handlers import start_shift, encashment, check_attractions, finish_shift, adm_get_stats
 from menu_commands import set_default_commands
 
 from aiogram.fsm.storage.redis import RedisStorage
@@ -23,7 +23,6 @@ async def auto_posting():
     while True:
         if (datetime.now(tz=timezone(timedelta(hours=3.0))).hour >= 10) \
                 and (datetime.now(tz=timezone(timedelta(hours=3.0))).hour <= 20):
-
             await asyncio.sleep(60 * 30)
 
             user_ids = DB.get_users()
@@ -32,15 +31,18 @@ async def auto_posting():
                 try:
                     await bot.send_message(
                         chat_id=user_id[0],
-                        text="⚠️ WARNING ⚠️"
+                        text="⚠️ ВНИМАНИЕ ⚠️\n\n"
                              "Пожалуйста, не забудьте сделать рекламный круг!"
                     )
                 except Exception as e:
                     print("The user has blocked the bot:", e)
+
                     DB.set_active(
                         active=0,
                         user_id=user_id[0]
                     )
+        else:
+            await asyncio.sleep(60)
 
 
 def creating_new_loop(global_loop):
@@ -53,13 +55,15 @@ async def main() -> None:
     dp.include_router(encashment.router_encashment)
     dp.include_router(check_attractions.router_attractions)
     dp.include_router(finish_shift.router_finish)
+    dp.include_router(adm_get_stats.router_adm)
+
+    await set_default_commands(bot)
+    await bot.delete_webhook(drop_pending_updates=True)
 
     global_loop = asyncio.get_event_loop()
     auto_posting_thread = Thread(target=creating_new_loop, args=(global_loop,))
     auto_posting_thread.start()
 
-    await set_default_commands(bot)
-    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 

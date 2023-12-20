@@ -35,12 +35,12 @@ class DataBase:
             cursor.close()
             connect.close()
 
-    def add_users(self, user_id: int, date: str, active: int):
+    def add_users(self, user_id: int, date: str, active: int) -> None:
         connect = self.connect_to_db()
         cursor = connect.cursor()
 
         try:
-            cursor.execute(f"INSERT INTO users (user_id, active, date) VALUES ({user_id}, {active}, {date});")
+            cursor.execute(f"INSERT INTO users (user_id, active) VALUES ({user_id}, {active});")
             connect.commit()
         except Exception as e:
             print("Error with INSERT:", e)
@@ -62,7 +62,7 @@ class DataBase:
             cursor.close()
             connect.close()
 
-    def set_active(self, active: int, user_id: int):
+    def set_active(self, active: int, user_id: int) -> None:
         connect = self.connect_to_db()
         cursor = connect.cursor()
 
@@ -75,8 +75,33 @@ class DataBase:
             cursor.close()
             connect.close()
 
-    def set_visitors(self):
-        pass
+    def set_data(self, date: str, name: str, place: str, count: int) -> None:
+        connect = self.connect_to_db()
+        cursor = connect.cursor()
 
-    def get_statistics(self):
-        pass
+        try:
+            cursor.execute(f"INSERT INTO visitors (date, name, place, count) VALUES ('{date}', '{name}', '{place}', {count});")
+            connect.commit()
+        except Exception as e:
+            print("Error with INSERT:", e)
+        finally:
+            cursor.close()
+            connect.close()
+
+    def get_statistics(self, date: str):
+        connect = self.connect_to_db()
+        cursor = connect.cursor()
+
+        try:
+            cursor.execute(f"SELECT v.count, v.name, v.place, v.date "
+                           f"FROM visitors AS v "
+                           f"WHERE date = '{date}' "
+                           f"GROUP BY v.count, v.name, v.place, v.date;")
+            row = cursor.fetchall()
+            return row
+        except Exception as e:
+            print("Error with statistics:", e)
+            return ["-----"]
+        finally:
+            cursor.close()
+            connect.close()

@@ -13,6 +13,7 @@ from keyboards.reply_markup_kb import create_yes_no_kb, create_cancel_kb, create
 from middlewares.album_middleware import AlbumsMiddleware
 from lexicon.lexicon_ru import LEXICON_RU
 from filters.check_user import CheckUserFilter
+from filters.is_admin import isAdminFilter
 from filters.check_chat import CheckChatFilter
 from config.config import config
 
@@ -254,24 +255,28 @@ async def process_thomas_command_yes(message: Message, state: FSMContext):
 
     start_shift_dict = await state.get_data()
 
-    await message.bot.send_message(chat_id='-1002034135560',
-                                   text=await report(start_shift_dict, current_date))
-    await message.bot.send_photo(chat_id='-1002034135560',
-                                 photo=start_shift_dict['photo'],
-                                 caption='Фото сотрудника')
-    await message.bot.send_video(chat_id='-1002034135560',
-                                 video=start_shift_dict['video'],
-                                 caption='Видео сотрудника')
+    try:
+        await message.bot.send_message(chat_id='-1002034135560',
+                                       text=await report(start_shift_dict, current_date))
+        await message.bot.send_photo(chat_id='-1002034135560',
+                                     photo=start_shift_dict['photo'],
+                                     caption='Фото сотрудника')
+        await message.bot.send_video(chat_id='-1002034135560',
+                                     video=start_shift_dict['video'],
+                                     caption='Видео сотрудника')
 
-    if start_shift_dict['train_has_defects'] != "no":
-        media_defects = [InputMediaPhoto(media=photo_file_id,
-                                         caption="Фото дефектов" if i == 0 else "")
-                         for i, photo_file_id in enumerate(start_shift_dict['train_has_defects'])]
+        if start_shift_dict['train_has_defects'] != "no":
+            media_defects = [InputMediaPhoto(media=photo_file_id,
+                                             caption="Фото дефектов" if i == 0 else "")
+                             for i, photo_file_id in enumerate(start_shift_dict['train_has_defects'])]
 
-        await message.bot.send_media_group(chat_id='-1002034135560',
-                                           media=media_defects)
-
-    await state.clear()
+            await message.bot.send_media_group(chat_id='-1002034135560',
+                                               media=media_defects)
+    except Exception as e:
+        print("Start shift report error:", e)
+        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
+    finally:
+        await state.clear()
 
 
 @router_start_shift.message(StateFilter(FSMStartShift.thomas), F.text == "Нет")
@@ -288,24 +293,28 @@ async def process_thomas_command_no(message: Message, state: FSMContext):
 
     start_shift_dict = await state.get_data()
 
-    await message.bot.send_message(chat_id='-1002034135560',
-                                   text=await report(start_shift_dict, current_date))
-    await message.bot.send_photo(chat_id='-1002034135560',
-                                 photo=start_shift_dict['photo'],
-                                 caption='Фото сотрудника')
-    await message.bot.send_video(chat_id='-1002034135560',
-                                 video=start_shift_dict['video'],
-                                 caption='Видео сотрудника')
+    try:
+        await message.bot.send_message(chat_id='-1002034135560',
+                                       text=await report(start_shift_dict, current_date))
+        await message.bot.send_photo(chat_id='-1002034135560',
+                                     photo=start_shift_dict['photo'],
+                                     caption='Фото сотрудника')
+        await message.bot.send_video(chat_id='-1002034135560',
+                                     video=start_shift_dict['video'],
+                                     caption='Видео сотрудника')
 
-    if start_shift_dict['train_has_defects'] != "no":
-        media_defects = [InputMediaPhoto(media=photo_file_id,
-                                         caption="Фото дефектов" if i == 0 else "")
-                         for i, photo_file_id in enumerate(start_shift_dict['train_has_defects'])]
+        if start_shift_dict['train_has_defects'] != "no":
+            media_defects = [InputMediaPhoto(media=photo_file_id,
+                                             caption="Фото дефектов" if i == 0 else "")
+                             for i, photo_file_id in enumerate(start_shift_dict['train_has_defects'])]
 
-        await message.bot.send_media_group(chat_id='-1002034135560',
-                                           media=media_defects)
-
-    await state.clear()
+            await message.bot.send_media_group(chat_id='-1002034135560',
+                                               media=media_defects)
+    except Exception as e:
+        print("Start shift report error:", e)
+        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
+    finally:
+        await state.clear()
 
 
 @router_start_shift.message(StateFilter(FSMStartShift.thomas))

@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\dneru\Documents\GitHub\Py-Aiogram-Tabel-Bot\py-tabel-tg-bot\venv"
+VIRTUAL_ENV="C:\Users\dneru\Desktop\py-tabel-tg-bot\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

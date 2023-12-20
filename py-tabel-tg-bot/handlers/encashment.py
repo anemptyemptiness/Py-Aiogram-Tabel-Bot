@@ -63,12 +63,17 @@ async def process_wait_for_check_command(message: Message, state: FSMContext):
         day_of_week = datetime.now().strftime('%A')
         date = datetime.now().strftime(f'%d/%m/%Y - {LEXICON_RU[day_of_week]}')
 
-        await message.bot.send_message(chat_id='-1002034135560',
-                                       text=await report(encashment_dict, date=date))
+        try:
+            await message.bot.send_message(chat_id='-1002034135560',
+                                           text=await report(encashment_dict, date=date))
 
-        await message.answer(text="Отлично, все данные отправлены начальству!",
-                             reply_markup=ReplyKeyboardRemove())
-        await state.clear()
+            await message.answer(text="Отлично, все данные отправлены начальству!",
+                                 reply_markup=ReplyKeyboardRemove())
+        except Exception as e:
+            print("Encashment report error:", e)
+            await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
+        finally:
+            await state.clear()
     else:
         await message.answer(text="Введите 0 или отправьте фото чека!",
                              reply_markup=await create_cancel_kb())
@@ -103,22 +108,24 @@ async def process_wait_for_date_command(message: Message, state: FSMContext):
     day_of_week = datetime.now().strftime('%A')
     date = datetime.now().strftime(f'%d/%m/%Y - {LEXICON_RU[day_of_week]}')
 
-    await message.bot.send_message(chat_id='-1002034135560',
-                                   text=await report(encashment_dict, date=date))
+    try:
+        await message.bot.send_message(chat_id='-1002034135560',
+                                       text=await report(encashment_dict, date=date))
 
-    if not isinstance(encashment_dict['photo_of_check'], str):
-        media_check = [InputMediaPhoto(media=photo_file_id,
-                                       caption="Фото чека инкассации" if i == 0 else "")
-                               for i, photo_file_id in enumerate(encashment_dict['photo_of_check'])]
-        await message.bot.send_media_group(chat_id="-1002034135560",
-                                           media=media_check)
+        if not isinstance(encashment_dict['photo_of_check'], str):
+            media_check = [InputMediaPhoto(media=photo_file_id,
+                                           caption="Фото чека инкассации" if i == 0 else "")
+                                   for i, photo_file_id in enumerate(encashment_dict['photo_of_check'])]
+            await message.bot.send_media_group(chat_id="-1002034135560",
+                                               media=media_check)
 
-        # await message.bot.send_photo(chat_id='-1002034135560',
-        #                              photo=encashment_dict['photo_of_check'],
-        #                              caption="Фото чека инкассации")
-    await message.answer(text="Отлично, все данные отправлены начальству!",
-                         reply_markup=ReplyKeyboardRemove())
-    await state.clear()
+        await message.answer(text="Отлично, все данные отправлены начальству!",
+                             reply_markup=ReplyKeyboardRemove())
+    except Exception as e:
+        print("Encashment report error:", e)
+        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
+    finally:
+        await state.clear()
 
 
 @router_encashment.message(StateFilter(FSMEncashment.date_of_cash))

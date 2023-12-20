@@ -47,3 +47,7 @@ class FSMFinishShift(StatesGroup):
     necessary_photos = State()
     charge = State()
     charge_video = State()
+
+
+class FSMAdmin(StatesGroup):
+    stats = State()
