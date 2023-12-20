@@ -26,7 +26,6 @@ async def get_stats(message: Message, state: FSMContext):
     await state.update_data(date=message.text)
 
     rows = db.DB.get_statistics(message.text)
-    print(rows, len(rows))
     for i in range(len(rows)):
         await message.answer(text="Статистика по количеству посетителей за день "
                                   f"за {(await state.get_data())['date']}\n\n"
