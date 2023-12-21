@@ -2,4 +2,3 @@
 venv_maksim
 *.pyc
 .idea
-config/config.py
