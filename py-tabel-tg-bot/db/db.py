@@ -35,7 +35,7 @@ class DataBase:
             cursor.close()
             connect.close()
 
-    def add_users(self, user_id: int, date: str, active: int) -> None:
+    def add_users(self, user_id: int, active: int) -> None:
         connect = self.connect_to_db()
         cursor = connect.cursor()
 
@@ -75,12 +75,13 @@ class DataBase:
             cursor.close()
             connect.close()
 
-    def set_data(self, date: str, name: str, place: str, count: int) -> None:
+    def set_data(self, user_id: int, date: str, name: str, place: str, count: int) -> None:
         connect = self.connect_to_db()
         cursor = connect.cursor()
 
         try:
-            cursor.execute(f"INSERT INTO visitors (date, name, place, count) VALUES ('{date}', '{name}', '{place}', {count});")
+            cursor.execute("INSERT INTO visitors (user_id, date, name, place, count) "
+                           f"VALUES ({user_id}, '{date}', '{name}', '{place}', {count});")
             connect.commit()
         except Exception as e:
             print("Error with INSERT:", e)
@@ -88,15 +89,16 @@ class DataBase:
             cursor.close()
             connect.close()
 
-    def get_statistics(self, date: str):
+    def get_statistics(self, date_from: str, date_to: str):
         connect = self.connect_to_db()
         cursor = connect.cursor()
 
         try:
-            cursor.execute(f"SELECT v.count, v.name, v.place, v.date "
-                           f"FROM visitors AS v "
-                           f"WHERE date = '{date}' "
-                           f"GROUP BY v.count, v.name, v.place, v.date;")
+            cursor.execute("SELECT v.place, v.name, SUM(v.count) "
+                           "FROM visitors AS v "
+                           f"WHERE v.date BETWEEN '{date_from}' AND '{date_to}' "
+                           "GROUP BY v.place, v.name "
+                           "ORDER BY 1;")
             row = cursor.fetchall()
             return row
         except Exception as e:
