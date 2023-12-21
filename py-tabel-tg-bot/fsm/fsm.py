@@ -3,6 +3,7 @@ from aiogram.fsm.state import StatesGroup, State
 
 class FSMStartShift(StatesGroup):
     place = State()
+    policy = State()
     my_name = State()
     my_photo = State()
     my_video = State()

@@ -1,19 +1,18 @@
 from typing import Dict, Any
 from datetime import datetime
 
-from aiogram import Router, F
-from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto
+from aiogram import Router, F, Bot
+from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto, CallbackQuery
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import default_state
 from aiogram.fsm.context import FSMContext
 
 import db
 from fsm.fsm import FSMStartShift
-from keyboards.reply_markup_kb import create_yes_no_kb, create_cancel_kb, create_places_kb
+from keyboards.keyboards import create_yes_no_kb, create_cancel_kb, create_places_kb, create_inline_kb
 from middlewares.album_middleware import AlbumsMiddleware
-from lexicon.lexicon_ru import LEXICON_RU
+from lexicon.lexicon_ru import LEXICON_RU, rools
 from filters.check_user import CheckUserFilter
-from filters.is_admin import isAdminFilter
 from filters.check_chat import CheckChatFilter
 from config.config import config
 
@@ -79,16 +78,37 @@ async def process_place_command(message: Message, state: FSMContext):
 
 
 @router_start_shift.message(StateFilter(FSMStartShift.place), F.text)
-async def process_start_shift_command(message: Message, state: FSMContext):
+async def process_start_shift_command(message: Message, state: FSMContext, bot: Bot):
     await state.update_data(place=message.text)
-    await message.answer(text="Пожалуйста, введите Ваше имя",
-                         reply_markup=await create_cancel_kb())
-    await state.set_state(FSMStartShift.my_name)
+    message_entity = await message.answer(text="Сохраняю...",
+                                          reply_markup=ReplyKeyboardRemove())
+    await bot.delete_message(chat_id=message_entity.chat.id,
+                             message_id=message_entity.message_id)
+    await message.answer(text=rools,
+                         reply_markup=await create_inline_kb())
+    await state.set_state(FSMStartShift.policy)
 
 
 @router_start_shift.message(StateFilter(FSMStartShift.place))
 async def warning_place_command(message: Message):
     await message.answer(text="Выберите рабочую точку ниже из выпадающего списка",
+                         reply_markup=await create_cancel_kb())
+
+
+@router_start_shift.callback_query(StateFilter(FSMStartShift.policy), F.data == "agree")
+async def process_policy_command(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    await state.update_data(policy="agree")
+    await callback.answer(text="✅")
+    await bot.delete_message(chat_id=callback.message.chat.id,
+                             message_id=callback.message.message_id)
+    await callback.message.answer(text="Пожалуйста, введите Ваше имя!",
+                                  reply_markup=await create_cancel_kb())
+    await state.set_state(FSMStartShift.my_name)
+
+
+@router_start_shift.message(StateFilter(FSMStartShift.policy))
+async def warning_policy_command(message: Message):
+    await message.answer(text="Для согласия с правилами нажмите на кнопку под самими правилами!",
                          reply_markup=await create_cancel_kb())
 
 

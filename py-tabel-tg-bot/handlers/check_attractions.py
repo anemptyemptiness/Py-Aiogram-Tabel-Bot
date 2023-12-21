@@ -8,7 +8,7 @@ from aiogram.fsm.state import default_state
 
 from lexicon.lexicon_ru import LEXICON_RU
 from fsm.fsm import FSMAttractionsCheck
-from keyboards.reply_markup_kb import create_yes_no_kb, create_places_kb, create_cancel_kb
+from keyboards.keyboards import create_yes_no_kb, create_places_kb, create_cancel_kb
 
 router_attractions = Router()
 

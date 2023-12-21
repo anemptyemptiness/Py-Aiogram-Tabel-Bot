@@ -9,7 +9,7 @@ from aiogram.filters import StateFilter, Command
 import db
 from fsm.fsm import FSMFinishShift
 from lexicon.lexicon_ru import LEXICON_RU
-from keyboards.reply_markup_kb import create_cancel_kb, create_yes_no_kb, create_places_kb
+from keyboards.keyboards import create_cancel_kb, create_yes_no_kb, create_places_kb
 from middlewares.album_middleware import AlbumsMiddleware
 
 router_finish = Router()
