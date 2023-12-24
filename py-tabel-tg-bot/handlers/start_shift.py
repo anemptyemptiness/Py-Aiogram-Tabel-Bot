@@ -1,3 +1,4 @@
+import time
 from typing import Dict, Any
 from datetime import datetime
 
@@ -14,7 +15,8 @@ from middlewares.album_middleware import AlbumsMiddleware
 from lexicon.lexicon_ru import LEXICON_RU, rools
 from filters.check_user import CheckUserFilter
 from filters.check_chat import CheckChatFilter
-from config.config import config
+from filters.is_admin import isAdminFilter
+from config.config import config, place_chat
 
 router_start_shift = Router()
 router_start_shift.message.middleware(middleware=AlbumsMiddleware(2))
@@ -39,7 +41,7 @@ async def warning_chat(message: Message):
     pass
 
 
-@router_start_shift.message(CheckUserFilter(config.employees))
+@router_start_shift.message(CheckUserFilter(config.employees) or isAdminFilter(config.admins))
 async def warning_user(message: Message):
     await message.answer(text="Вас нет в списке работников данной компании")
 
@@ -49,8 +51,6 @@ async def process_command_start(message: Message):
     if not db.DB.user_exists(message.from_user.id):
         db.DB.add_users(
             user_id=message.from_user.id,
-            date=datetime.now().strftime("%d/%m/%Y"),
-            active=1
         )
 
         await message.answer(text="Добро пожаловать!")
@@ -99,6 +99,9 @@ async def warning_place_command(message: Message):
 async def process_policy_command(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await state.update_data(policy="agree")
     await callback.answer(text="✅")
+
+    time.sleep(1)
+
     await bot.delete_message(chat_id=callback.message.chat.id,
                              message_id=callback.message.message_id)
     await callback.message.answer(text="Пожалуйста, введите Ваше имя!",
@@ -267,8 +270,6 @@ async def warning_process_train_clean(message: Message):
 @router_start_shift.message(StateFilter(FSMStartShift.thomas), F.text == "Да")
 async def process_thomas_command_yes(message: Message, state: FSMContext):
     await state.update_data(is_thomas_on="yes")
-    await message.answer(text="Отлично! Отчёт сформирован... Отправляю начальству!",
-                         reply_markup=ReplyKeyboardRemove())
 
     day_of_week = datetime.now().strftime('%A')
     current_date = datetime.now().strftime(f'%d/%m/%Y - {LEXICON_RU[day_of_week]}')
@@ -276,12 +277,14 @@ async def process_thomas_command_yes(message: Message, state: FSMContext):
     start_shift_dict = await state.get_data()
 
     try:
-        await message.bot.send_message(chat_id='-1002034135560',
+        await message.answer(text="Отлично! Отчёт сформирован... Отправляю начальству!",
+                             reply_markup=ReplyKeyboardRemove())
+        await message.bot.send_message(chat_id=place_chat[start_shift_dict['place']],
                                        text=await report(start_shift_dict, current_date))
-        await message.bot.send_photo(chat_id='-1002034135560',
+        await message.bot.send_photo(chat_id=place_chat[start_shift_dict['place']],
                                      photo=start_shift_dict['photo'],
                                      caption='Фото сотрудника')
-        await message.bot.send_video(chat_id='-1002034135560',
+        await message.bot.send_video(chat_id=place_chat[start_shift_dict['place']],
                                      video=start_shift_dict['video'],
                                      caption='Видео сотрудника')
 
@@ -290,7 +293,7 @@ async def process_thomas_command_yes(message: Message, state: FSMContext):
                                              caption="Фото дефектов" if i == 0 else "")
                              for i, photo_file_id in enumerate(start_shift_dict['train_has_defects'])]
 
-            await message.bot.send_media_group(chat_id='-1002034135560',
+            await message.bot.send_media_group(chat_id=place_chat[start_shift_dict['place']],
                                                media=media_defects)
     except Exception as e:
         print("Start shift report error:", e)
@@ -305,21 +308,20 @@ async def process_thomas_command_no(message: Message, state: FSMContext):
     await message.answer(text="Надо включить!",
                          reply_markup=await create_cancel_kb())
 
-    await message.answer(text="Отлично! Отчёт сформирован... Отправляю начальству!",
-                         reply_markup=ReplyKeyboardRemove())
-
     day_of_week = datetime.now().strftime('%A')
     current_date = datetime.now().strftime(f'%d/%m/%Y - {LEXICON_RU[day_of_week]}')
 
     start_shift_dict = await state.get_data()
 
     try:
-        await message.bot.send_message(chat_id='-1002034135560',
+        await message.answer(text="Отлично! Отчёт сформирован... Отправляю начальству!",
+                             reply_markup=ReplyKeyboardRemove())
+        await message.bot.send_message(chat_id=place_chat[start_shift_dict['place']],
                                        text=await report(start_shift_dict, current_date))
-        await message.bot.send_photo(chat_id='-1002034135560',
+        await message.bot.send_photo(chat_id=place_chat[start_shift_dict['place']],
                                      photo=start_shift_dict['photo'],
                                      caption='Фото сотрудника')
-        await message.bot.send_video(chat_id='-1002034135560',
+        await message.bot.send_video(chat_id=place_chat[start_shift_dict['place']],
                                      video=start_shift_dict['video'],
                                      caption='Видео сотрудника')
 
@@ -328,7 +330,7 @@ async def process_thomas_command_no(message: Message, state: FSMContext):
                                              caption="Фото дефектов" if i == 0 else "")
                              for i, photo_file_id in enumerate(start_shift_dict['train_has_defects'])]
 
-            await message.bot.send_media_group(chat_id='-1002034135560',
+            await message.bot.send_media_group(chat_id=place_chat[start_shift_dict['place']],
                                                media=media_defects)
     except Exception as e:
         print("Start shift report error:", e)

@@ -10,6 +10,7 @@ from fsm.fsm import FSMEncashment
 from lexicon.lexicon_ru import LEXICON_RU
 from keyboards.keyboards import create_cancel_kb, create_places_kb
 from middlewares.album_middleware import AlbumsMiddleware
+from config.config import place_chat
 
 router_encashment = Router()
 router_encashment.message.middleware(middleware=AlbumsMiddleware(2))
@@ -64,7 +65,7 @@ async def process_wait_for_check_command(message: Message, state: FSMContext):
         date = datetime.now().strftime(f'%d/%m/%Y - {LEXICON_RU[day_of_week]}')
 
         try:
-            await message.bot.send_message(chat_id='-1002034135560',
+            await message.bot.send_message(chat_id=place_chat[encashment_dict['place']],
                                            text=await report(encashment_dict, date=date))
 
             await message.answer(text="Отлично, все данные отправлены начальству!",
@@ -109,14 +110,14 @@ async def process_wait_for_date_command(message: Message, state: FSMContext):
     date = datetime.now().strftime(f'%d/%m/%Y - {LEXICON_RU[day_of_week]}')
 
     try:
-        await message.bot.send_message(chat_id='-1002034135560',
+        await message.bot.send_message(chat_id=place_chat[encashment_dict['place']],
                                        text=await report(encashment_dict, date=date))
 
         if not isinstance(encashment_dict['photo_of_check'], str):
             media_check = [InputMediaPhoto(media=photo_file_id,
                                            caption="Фото чека инкассации" if i == 0 else "")
                                    for i, photo_file_id in enumerate(encashment_dict['photo_of_check'])]
-            await message.bot.send_media_group(chat_id="-1002034135560",
+            await message.bot.send_media_group(chat_id=place_chat[encashment_dict['place']],
                                                media=media_check)
 
         await message.answer(text="Отлично, все данные отправлены начальству!",

@@ -9,6 +9,7 @@ from aiogram.fsm.state import default_state
 from lexicon.lexicon_ru import LEXICON_RU
 from fsm.fsm import FSMAttractionsCheck
 from keyboards.keyboards import create_yes_no_kb, create_places_kb, create_cancel_kb
+from config.config import place_chat
 
 router_attractions = Router()
 
@@ -98,7 +99,7 @@ async def process_attracts_command_no(message: Message, state: FSMContext):
     date = datetime.now().strftime(f'%d/%m/%Y - {LEXICON_RU[day_of_week]}')
 
     try:
-        await message.bot.send_message(chat_id="-1002034135560",
+        await message.bot.send_message(chat_id=place_chat[check_attractions_dict['place']],
                                        text=await report(check_attractions_dict, date=date),
                                        parse_mode="html")
 
@@ -126,7 +127,7 @@ async def process_defects_on_attracts_command(message: Message, state: FSMContex
     date = datetime.now().strftime(f'%d/%m/%Y - {LEXICON_RU[day_of_week]}')
 
     try:
-        await message.bot.send_message(chat_id="-1002034135560",
+        await message.bot.send_message(chat_id=place_chat[check_attractions_dict['place']],
                                        text=await report(check_attractions_dict, date=date),
                                        parse_mode="html")
 

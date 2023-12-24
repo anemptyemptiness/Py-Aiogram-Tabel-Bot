@@ -27,15 +27,16 @@ def load_config() -> Config:
     env.read_env()
 
     return Config(tg_bot=TgBot(token=env("TOKEN")),
-                  employees=[int(f"{env(f'employee_{i}')}") for i in range(1, 6)],
-                  admin_chats=[f"{env(f'chat_id_{i}')}" for i in range(1, 2)],
+                  employees=[int(f"{env(f'employee_{i}')}") for i in range(1, 4)],
+                  admins=[f"{env(f'admin_{i}')}" for i in range(1, 4)],
+                  admin_chats=[f"{env(f'chat_id_{i}')}" for i in range(1, 3)],
                   places=[f"{env(f'place_{i}')}" for i in range(1, 6)],
                   redis=Redis(host=f"{env('redis_host')}"),
                   user_db=env("user"),
                   password_db=env("password"),
                   database=env("database"),
-                  host_db=env("host"),
-                  admins=[f"{env(f'admin_{i}')}" for i in range(1, 5)])
+                  host_db=env("host"))
 
 
 config: Config = load_config()
+place_chat: dict = {config.places[i]: config.admin_chats[i] for i in range(len(config.admin_chats))}

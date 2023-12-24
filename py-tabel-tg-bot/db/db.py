@@ -35,12 +35,12 @@ class DataBase:
             cursor.close()
             connect.close()
 
-    def add_users(self, user_id: int, active: int) -> None:
+    def add_users(self, user_id: int) -> None:
         connect = self.connect_to_db()
         cursor = connect.cursor()
 
         try:
-            cursor.execute(f"INSERT INTO users (user_id, active) VALUES ({user_id}, {active});")
+            cursor.execute(f"INSERT INTO users (user_id) VALUES ({user_id});")
             connect.commit()
         except Exception as e:
             print("Error with INSERT:", e)
@@ -58,19 +58,6 @@ class DataBase:
             return True if user_id else False
         except Exception as e:
             print("Error with CHECK EXISTS:", e)
-        finally:
-            cursor.close()
-            connect.close()
-
-    def set_active(self, active: int, user_id: int) -> None:
-        connect = self.connect_to_db()
-        cursor = connect.cursor()
-
-        try:
-            cursor.execute(f"UPDATE users SET active = {active} WHERE user_id = {user_id};")
-            connect.commit()
-        except Exception as e:
-            print("Error with UPDATE:", e)
         finally:
             cursor.close()
             connect.close()

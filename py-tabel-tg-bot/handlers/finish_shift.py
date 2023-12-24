@@ -11,6 +11,7 @@ from fsm.fsm import FSMFinishShift
 from lexicon.lexicon_ru import LEXICON_RU
 from keyboards.keyboards import create_cancel_kb, create_yes_no_kb, create_places_kb
 from middlewares.album_middleware import AlbumsMiddleware
+from config.config import place_chat
 
 router_finish = Router()
 router_finish.message.middleware(middleware=AlbumsMiddleware(2))
@@ -259,29 +260,29 @@ async def process_charge_video_command(message: Message, state: FSMContext):
         await state.update_data(charge_video=message.video.file_id)
         finish_shift_dict = await state.get_data()
 
-        await message.answer(text="Отлично! Формирую отчёт...\nОтправляю начальству!",
-                             reply_markup=ReplyKeyboardRemove())
-
         day_of_week = datetime.now().strftime('%A')
         date = datetime.now().strftime(f'%d-%m-%Y - {LEXICON_RU[day_of_week]}')
 
         try:
+            await message.answer(text="Отлично! Формирую отчёт...\nОтправляю начальству!",
+                                 reply_markup=ReplyKeyboardRemove())
+
             if 'photo_of_beneficiaries' in finish_shift_dict:
                 media_beneficiaries = [InputMediaPhoto(media=photo_file_id,
                                                        caption="Фото льготников" if i == 0 else "")
                                        for i, photo_file_id in enumerate(finish_shift_dict['photo_of_beneficiaries'])]
-                await message.bot.send_media_group(chat_id="-1002034135560",
+                await message.bot.send_media_group(chat_id=place_chat[finish_shift_dict['place']],
                                                    media=media_beneficiaries)
 
             media_necessary = [InputMediaPhoto(media=photo_file_id,
                                                caption="Чеки и необходимые фото за смену" if i == 0 else "")
                                for i, photo_file_id in enumerate(finish_shift_dict['necessary_photos'])]
 
-            await message.bot.send_message(chat_id="-1002034135560",
+            await message.bot.send_message(chat_id=place_chat[finish_shift_dict['place']],
                                            text=await report(finish_shift_dict, date=date))
-            await message.bot.send_media_group(chat_id="-1002034135560",
+            await message.bot.send_media_group(chat_id=place_chat[finish_shift_dict['place']],
                                                media=media_necessary)
-            await message.bot.send_video(chat_id="-1002034135560",
+            await message.bot.send_video(chat_id=place_chat[finish_shift_dict['place']],
                                          video=finish_shift_dict['charge_video'],
                                          caption="Видео аккумулятора и внешнего вида поезда")
 

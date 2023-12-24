@@ -9,4 +9,4 @@ class CheckUserFilter(BaseFilter):
         self.user_ids = user_ids
 
     async def __call__(self, message: Message) -> bool:
-        return message.from_user.id not in self.user_ids
+        return str(message.from_user.id) in self.user_ids
