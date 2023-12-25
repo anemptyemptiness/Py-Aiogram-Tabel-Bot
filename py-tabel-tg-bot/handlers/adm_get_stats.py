@@ -73,7 +73,7 @@ async def get_stats(message: Message, state: FSMContext):
         await state.clear()
 
 
-@router_adm.message(isAdminFilter(config.admins))
+@router_adm.message(isAdminFilter(config.admins), StateFilter(FSMAdmin.stats))
 async def warning_get_stats(message: Message):
     await message.answer(text="Введите дату в таком формате: <em>Год-месяц-день</em> через пробел\n\n"
                               'Например: 2023-12-20 2023-12-21\n\n'
