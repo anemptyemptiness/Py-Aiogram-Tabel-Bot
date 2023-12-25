@@ -52,7 +52,8 @@ async def process_command_start(message: Message):
             user_id=message.from_user.id,
         )
 
-        await message.answer(text="Добро пожаловать!")
+        await message.answer(text=f"Добро пожаловать, {message.from_user.full_name}!\n\n"
+                                  "Используйте меню в левой нижней части экрана, чтобы работать с ботом")
     else:
         await message.answer(text="Вы уже зарегистрированы в боте!")
 
