@@ -118,7 +118,7 @@ async def warning_name_command(message: Message):
                          reply_markup=ReplyKeyboardRemove())
 
 
-@router_finish.message(StateFilter(FSMFinishShift.summary), F.text.isdigit())
+@router_finish.message(StateFilter(FSMFinishShift.summary), F.text)
 async def process_summary_command(message: Message, state: FSMContext):
     await state.update_data(summary=message.text)
     await message.answer(text="Введите сумму наличных за сегодня",
@@ -132,7 +132,7 @@ async def warning_summary_command(message: Message):
                          reply_markup=ReplyKeyboardRemove())
 
 
-@router_finish.message(StateFilter(FSMFinishShift.cash), F.text.isdigit())
+@router_finish.message(StateFilter(FSMFinishShift.cash), F.text)
 async def process_cash_command(message: Message, state: FSMContext):
     await state.update_data(cash=message.text)
     await message.answer(text="Введите сумму безнала за сегодня",
@@ -146,7 +146,7 @@ async def warning_cash_command(message: Message):
                          reply_markup=await create_cancel_kb())
 
 
-@router_finish.message(StateFilter(FSMFinishShift.online_cash), F.text.isdigit())
+@router_finish.message(StateFilter(FSMFinishShift.online_cash), F.text)
 async def process_online_cash_command(message: Message, state: FSMContext):
     await state.update_data(online_cash=message.text)
     await message.answer(text="Введите сумму оплаты по QR-коду за сегодня",
@@ -160,7 +160,7 @@ async def warning_online_cash_command(message: Message):
                          reply_markup=await create_cancel_kb())
 
 
-@router_finish.message(StateFilter(FSMFinishShift.qr_code), F.text.isdigit())
+@router_finish.message(StateFilter(FSMFinishShift.qr_code), F.text)
 async def process_qr_code_command(message: Message, state: FSMContext):
     await state.update_data(qr_code=message.text)
     await message.answer(text="Введите сумму расхода за сегодня",
@@ -174,7 +174,7 @@ async def warning_qr_code_command(message: Message):
                          reply_markup=await create_cancel_kb())
 
 
-@router_finish.message(StateFilter(FSMFinishShift.expenditure), F.text.isdigit())
+@router_finish.message(StateFilter(FSMFinishShift.expenditure), F.text)
 async def process_expenditure_command(message: Message, state: FSMContext):
     await state.update_data(expenditure=message.text)
     await message.answer(text="Введите сумму, сколько Вы взяли сегодня зарплатой\n\n"
@@ -204,7 +204,7 @@ async def warning_salary_command(message: Message):
                          reply_markup=await create_cancel_kb())
 
 
-@router_finish.message(StateFilter(FSMFinishShift.encashment), F.text.isdigit())
+@router_finish.message(StateFilter(FSMFinishShift.encashment), F.text)
 async def process_encashment_command(message: Message, state: FSMContext):
     await state.update_data(encashment=message.text)
     await message.answer(text="Прикрепите чеки и необходимые фотографии за смену "
