@@ -4,8 +4,8 @@ from typing import Union
 
 
 class isAdminFilter(BaseFilter):
-    def __init__(self, admin_ids: list[Union[str, int]]):
+    def __init__(self, admin_ids: list):
         self.admin_ids = admin_ids
 
     async def __call__(self, message: Message) -> bool:
-        return str(message.from_user.id) in self.admin_ids
+        return message.from_user.id in self.admin_ids

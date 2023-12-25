@@ -13,9 +13,8 @@ from fsm.fsm import FSMStartShift
 from keyboards.keyboards import create_yes_no_kb, create_cancel_kb, create_places_kb, create_inline_kb
 from middlewares.album_middleware import AlbumsMiddleware
 from lexicon.lexicon_ru import LEXICON_RU, rools
-from filters.check_user import CheckUserFilter
 from filters.check_chat import CheckChatFilter
-from filters.is_admin import isAdminFilter
+from filters.admin_or_employee import CheckUserFilter
 from config.config import config, place_chat
 
 router_start_shift = Router()
@@ -41,7 +40,7 @@ async def warning_chat(message: Message):
     pass
 
 
-@router_start_shift.message(CheckUserFilter(config.employees) or isAdminFilter(config.admins))
+@router_start_shift.message(CheckUserFilter(config.admins, config.employees))
 async def warning_user(message: Message):
     await message.answer(text="Вас нет в списке работников данной компании")
 
