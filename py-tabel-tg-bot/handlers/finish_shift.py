@@ -11,7 +11,7 @@ from fsm.fsm import FSMFinishShift
 from lexicon.lexicon_ru import LEXICON_RU
 from keyboards.keyboards import create_cancel_kb, create_yes_no_kb, create_places_kb
 from middlewares.album_middleware import AlbumsMiddleware
-from config.config import place_chat
+from config.config import place_chat, config
 
 router_finish = Router()
 router_finish.message.middleware(middleware=AlbumsMiddleware(2))
@@ -294,7 +294,9 @@ async def process_charge_video_command(message: Message, state: FSMContext):
                 count=finish_shift_dict['visitors']
             )
         except Exception as e:
-            print("Finish shift report error:", e)
+            await message.bot.send_message(text=f"Finish shift report error: {e}\n"
+                                                f"User_id: {message.from_user.id}",
+                                           chat_id=config.admins[0])
             await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
         finally:
             await state.clear()

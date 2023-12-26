@@ -6,6 +6,7 @@ from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 
+import config.config
 from fsm.fsm import FSMEncashment
 from lexicon.lexicon_ru import LEXICON_RU
 from keyboards.keyboards import create_cancel_kb, create_places_kb
@@ -71,7 +72,9 @@ async def process_wait_for_check_command(message: Message, state: FSMContext):
             await message.answer(text="Отлично, все данные отправлены начальству!",
                                  reply_markup=ReplyKeyboardRemove())
         except Exception as e:
-            print("Encashment report error:", e)
+            await message.bot.send_message(text=f"Encashment report error: {e}\n"
+                                                f"User_id: {message.from_user.id}",
+                                           chat_id=config.config.config.admins[0])
             await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
         finally:
             await state.clear()
@@ -123,7 +126,9 @@ async def process_wait_for_date_command(message: Message, state: FSMContext):
         await message.answer(text="Отлично, все данные отправлены начальству!",
                              reply_markup=ReplyKeyboardRemove())
     except Exception as e:
-        print("Encashment report error:", e)
+        await message.bot.send_message(text=f"Encashment report error: {e}\n"
+                                            f"User_id: {message.from_user.id}",
+                                       chat_id=config.config.config.admins[0])
         await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
     finally:
         await state.clear()

@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters import StateFilter, Command
 from aiogram.fsm.state import default_state
 
+import config.config
 from lexicon.lexicon_ru import LEXICON_RU
 from fsm.fsm import FSMAttractionsCheck
 from keyboards.keyboards import create_yes_no_kb, create_places_kb, create_cancel_kb
@@ -106,7 +107,9 @@ async def process_attracts_command_no(message: Message, state: FSMContext):
         await message.answer(text="Отлично, отчёт сформирован...\nОтправляю начальству!",
                              reply_markup=ReplyKeyboardRemove())
     except Exception as e:
-        print("Check attractions report error:", e)
+        await message.bot.send_message(text=f"Check attractions report error: {e}\n"
+                                            f"User_id: {message.from_user.id}",
+                                       chat_id=config.config.config.admins[0])
         await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
     finally:
         await state.clear()
@@ -134,7 +137,9 @@ async def process_defects_on_attracts_command(message: Message, state: FSMContex
         await message.answer(text="Отлично, отчёт сформирован...\nОтправляю начальству!",
                              reply_markup=ReplyKeyboardRemove())
     except Exception as e:
-        print("Check attractions report error:", e)
+        await message.bot.send_message(text=f"Check attractions report error: {e}\n"
+                                            f"User_id: {message.from_user.id}",
+                                       chat_id=config.config.config.admins[0])
         await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
     finally:
         await state.clear()

@@ -64,7 +64,9 @@ async def get_stats(message: Message, state: FSMContext):
                              parse_mode="html")
 
     except Exception as e:
-        print("Get stats error:", e)
+        await message.bot.send_message(text=f"Get stats error: {e}\n"
+                                            f"User_id: {message.from_user.id}",
+                                       chat_id=config.admins[0])
         await message.answer(text="⚠️ ВНИМАНИЕ ⚠️\n\n"
                                   "Возникла <b>ошибка</b> при сборе данных, "
                                   "проверьте правильность введенных значений и повторите команду",

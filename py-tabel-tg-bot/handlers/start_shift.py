@@ -296,9 +296,10 @@ async def process_thomas_command_yes(message: Message, state: FSMContext):
         await message.answer(text="Отлично! Отчёт сформирован... Отправляю начальству!",
                              reply_markup=ReplyKeyboardRemove())
     except Exception as e:
-        print("Start shift report error:", e)
-        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!\n"
-                                  f"{e}")
+        await message.bot.send_message(text=f"Start shift report error: {e}\n"
+                                            f"User_id: {message.from_user.id}",
+                                       chat_id=config.admins[0])
+        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
     finally:
         await state.clear()
 
@@ -334,9 +335,10 @@ async def process_thomas_command_no(message: Message, state: FSMContext):
         await message.answer(text="Отлично! Отчёт сформирован... Отправляю начальству!",
                              reply_markup=ReplyKeyboardRemove())
     except Exception as e:
-        print("Start shift report error:", e)
-        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!\n"
-                                  f"{e}")
+        await message.bot.send_message(text=f"Start shift report error: {e}\n"
+                                            f"User_id: {message.from_user.id}",
+                                       chat_id=config.admins[0])
+        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
     finally:
         await state.clear()
 
