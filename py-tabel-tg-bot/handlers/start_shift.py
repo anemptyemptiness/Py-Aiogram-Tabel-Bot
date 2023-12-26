@@ -277,8 +277,6 @@ async def process_thomas_command_yes(message: Message, state: FSMContext):
     start_shift_dict = await state.get_data()
 
     try:
-        await message.answer(text="Отлично! Отчёт сформирован... Отправляю начальству!",
-                             reply_markup=ReplyKeyboardRemove())
         await message.bot.send_message(chat_id=place_chat[start_shift_dict['place']],
                                        text=await report(start_shift_dict, current_date))
         await message.bot.send_photo(chat_id=place_chat[start_shift_dict['place']],
@@ -295,6 +293,8 @@ async def process_thomas_command_yes(message: Message, state: FSMContext):
 
             await message.bot.send_media_group(chat_id=place_chat[start_shift_dict['place']],
                                                media=media_defects)
+        await message.answer(text="Отлично! Отчёт сформирован... Отправляю начальству!",
+                             reply_markup=ReplyKeyboardRemove())
     except Exception as e:
         print("Start shift report error:", e)
         await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
@@ -314,8 +314,6 @@ async def process_thomas_command_no(message: Message, state: FSMContext):
     start_shift_dict = await state.get_data()
 
     try:
-        await message.answer(text="Отлично! Отчёт сформирован... Отправляю начальству!",
-                             reply_markup=ReplyKeyboardRemove())
         await message.bot.send_message(chat_id=place_chat[start_shift_dict['place']],
                                        text=await report(start_shift_dict, current_date))
         await message.bot.send_photo(chat_id=place_chat[start_shift_dict['place']],
@@ -332,6 +330,8 @@ async def process_thomas_command_no(message: Message, state: FSMContext):
 
             await message.bot.send_media_group(chat_id=place_chat[start_shift_dict['place']],
                                                media=media_defects)
+        await message.answer(text="Отлично! Отчёт сформирован... Отправляю начальству!",
+                             reply_markup=ReplyKeyboardRemove())
     except Exception as e:
         print("Start shift report error:", e)
         await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
