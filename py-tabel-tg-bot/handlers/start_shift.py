@@ -297,7 +297,8 @@ async def process_thomas_command_yes(message: Message, state: FSMContext):
                              reply_markup=ReplyKeyboardRemove())
     except Exception as e:
         print("Start shift report error:", e)
-        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
+        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!\n"
+                                  f"{e}")
     finally:
         await state.clear()
 
@@ -334,7 +335,8 @@ async def process_thomas_command_no(message: Message, state: FSMContext):
                              reply_markup=ReplyKeyboardRemove())
     except Exception as e:
         print("Start shift report error:", e)
-        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!")
+        await message.answer(text="Упс... что-то пошло не так, сообщите руководству!\n"
+                                  f"{e}")
     finally:
         await state.clear()
 
