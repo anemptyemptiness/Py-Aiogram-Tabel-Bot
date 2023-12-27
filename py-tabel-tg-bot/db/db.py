@@ -62,13 +62,13 @@ class DataBase:
             cursor.close()
             connect.close()
 
-    def set_data(self, user_id: int, date: str, name: str, place: str, count: int) -> None:
+    def set_data(self, date: str, name: str, place: str, count: int) -> None:
         connect = self.connect_to_db()
         cursor = connect.cursor()
 
         try:
-            cursor.execute("INSERT INTO visitors (user_id, date, name, place, count) "
-                           f"VALUES ({user_id}, '{date}', '{name}', '{place}', {count});")
+            cursor.execute("INSERT INTO visitors (date, name, place, count) "
+                           f"VALUES ('{date}', '{name}', '{place}', {count});")
             connect.commit()
         except Exception as e:
             print("Error with INSERT:", e)

@@ -40,7 +40,7 @@ async def process_place_command(message: Message, state: FSMContext):
     await state.set_state(FSMFinishShift.place)
 
 
-@router_finish.message(StateFilter(FSMFinishShift.place), F.text)
+@router_finish.message(StateFilter(FSMFinishShift.place), F.text in config.places)
 async def process_finish_start_command(message: Message, state: FSMContext):
     await state.update_data(place=message.text)
     await message.answer(text="Сколько было посетителей за сегодня? (Пришлите ответ числом)",
@@ -287,7 +287,6 @@ async def process_charge_video_command(message: Message, state: FSMContext):
                                          caption="Видео аккумулятора и внешнего вида поезда")
 
             db.DB.set_data(
-                user_id=message.from_user.id,
                 date=datetime.now().strftime("%Y-%m-%d"),
                 name=finish_shift_dict['name'],
                 place=finish_shift_dict['place'],

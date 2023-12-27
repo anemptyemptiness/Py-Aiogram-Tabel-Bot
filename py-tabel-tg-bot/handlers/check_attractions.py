@@ -31,7 +31,7 @@ async def process_place_command(message: Message, state: FSMContext):
                          reply_markup=await create_places_kb())
 
 
-@router_attractions.message(StateFilter(FSMAttractionsCheck.place), F.text)
+@router_attractions.message(StateFilter(FSMAttractionsCheck.place), F.text in config.config.config.places)
 async def process_bill_acceptor_command(message: Message, state: FSMContext):
     await state.update_data(place=message.text)
     await message.answer(text="Все купюроприемники работают?",

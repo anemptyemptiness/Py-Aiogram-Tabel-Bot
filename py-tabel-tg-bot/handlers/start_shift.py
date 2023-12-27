@@ -77,7 +77,7 @@ async def process_place_command(message: Message, state: FSMContext):
     await state.set_state(FSMStartShift.place)
 
 
-@router_start_shift.message(StateFilter(FSMStartShift.place), F.text)
+@router_start_shift.message(StateFilter(FSMStartShift.place), F.text in config.places)
 async def process_start_shift_command(message: Message, state: FSMContext, bot: Bot):
     await state.update_data(place=message.text)
     message_entity = await message.answer(text="Сохраняю...",
