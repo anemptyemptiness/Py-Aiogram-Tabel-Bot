@@ -62,13 +62,13 @@ class DataBase:
             cursor.close()
             connect.close()
 
-    def set_data(self, date: str, name: str, place: str, count: int) -> None:
+    def set_data(self, user_id: int, date: str, name: str, place: str, count: int) -> None:
         connect = self.connect_to_db()
         cursor = connect.cursor()
 
         try:
-            cursor.execute("INSERT INTO visitors (date, name, place, count) "
-                           f"VALUES ('{date}', '{name}', '{place}', {count});")
+            cursor.execute("INSERT INTO visitors (user_id, date, name, place, count) "
+                           f"VALUES ({user_id}, '{date}', '{name}', '{place}', {count});")
             connect.commit()
         except Exception as e:
             print("Error with INSERT:", e)
@@ -81,11 +81,11 @@ class DataBase:
         cursor = connect.cursor()
 
         try:
-            cursor.execute("SELECT v.place, v.name, SUM(v.count) "
+            cursor.execute("SELECT v.user_id, v.place, v.name, SUM(v.count) "
                            "FROM visitors AS v "
                            f"WHERE v.date BETWEEN '{date_from}' AND '{date_to}' "
-                           "GROUP BY v.place, v.name "
-                           "ORDER BY 1;")
+                           "GROUP BY v.user_id, v.place, v.name "
+                           "ORDER BY 2;")
             row = cursor.fetchall()
             return row
         except Exception as e:

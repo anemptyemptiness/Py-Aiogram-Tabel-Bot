@@ -287,6 +287,7 @@ async def process_charge_video_command(message: Message, state: FSMContext):
                                          caption="Видео аккумулятора и внешнего вида поезда")
 
             db.DB.set_data(
+                user_id=message.from_user.id,
                 date=datetime.now().strftime("%Y-%m-%d"),
                 name=finish_shift_dict['name'],
                 place=finish_shift_dict['place'],
