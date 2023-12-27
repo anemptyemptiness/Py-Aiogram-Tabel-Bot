@@ -81,11 +81,11 @@ class DataBase:
         cursor = connect.cursor()
 
         try:
-            cursor.execute("SELECT v.user_id, v.place, v.name, SUM(v.count) "
+            cursor.execute("SELECT v.place, v.name, SUM(v.count) "
                            "FROM visitors AS v "
                            f"WHERE v.date BETWEEN '{date_from}' AND '{date_to}' "
-                           "GROUP BY v.user_id, v.place, v.name "
-                           "ORDER BY 2;")
+                           "GROUP BY v.place, v.name "
+                           "ORDER BY 1;")
             row = cursor.fetchall()
             return row
         except Exception as e:
