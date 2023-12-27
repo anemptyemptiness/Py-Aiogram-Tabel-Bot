@@ -36,11 +36,11 @@ async def get_stats(message: Message, state: FSMContext):
         rows = db.DB.get_statistics(date_from=date_from, date_to=date_to)
 
         places = {
-            "Белая Дача": sum([row[0].count("Белая Дача") for row in rows]),
-            "Ривьера": sum([row[0].count("Ривьера") for row in rows]),
-            "Рига Молл": sum([row[0].count("Рига Молл") for row in rows]),
-            "Вегас Кунцево": sum([row[0].count("Вегас Кунцево") for row in rows]),
-            "Щелковский": sum([row[0].count("Щелковский") for row in rows]),
+            "Белая Дача": sum([row[1].count("Белая Дача") for row in rows]),
+            "Ривьера": sum([row[1].count("Ривьера") for row in rows]),
+            "Рига Молл": sum([row[1].count("Рига Молл") for row in rows]),
+            "Вегас Кунцево": sum([row[1].count("Вегас Кунцево") for row in rows]),
+            "Щелковский": sum([row[1].count("Щелковский") for row in rows]),
         }
 
         report = f"📊Статистика по посетителям точек\n<b>от</b> {date_from} <b>до</b> {date_to}\n\n"
