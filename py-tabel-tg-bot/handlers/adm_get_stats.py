@@ -49,11 +49,11 @@ async def get_stats(message: Message, state: FSMContext):
 
         for count in places.values():
             if count:
-                report += f"Рабочая точка: <b>{rows[index_place][0]}</b>\n"
+                report += f"Рабочая точка: <b>{rows[index_place][1]}</b>\n"
 
                 for i in range(count):
-                    report += f"📝Работник: <em>{rows[index_rows][1]}</em>\n└"
-                    report += f"посетителей: <em>{rows[index_rows][2]}</em>\n\n"
+                    report += f"📝Работник: <em>{rows[index_rows][2]}</em>\n└"
+                    report += f"посетителей: <em>{rows[index_rows][3]}</em>\n\n"
 
                     index_rows += 1
 
