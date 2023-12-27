@@ -27,9 +27,9 @@ def load_config() -> Config:
     env.read_env()
 
     return Config(tg_bot=TgBot(token=env("TOKEN")),
-                  employees=[int(f"{env(f'employee_{i}')}") for i in range(1, 5)],
+                  employees=[int(f"{env(f'employee_{i}')}") for i in range(1, 10)],
                   admins=[int(f"{env(f'admin_{i}')}") for i in range(1, 4)],
-                  admin_chats=[f"{env(f'chat_id_{i}')}" for i in range(1, 3)],
+                  admin_chats=[f"{env(f'chat_id_{i}')}" for i in range(1, 6)],
                   places=[f"{env(f'place_{i}')}" for i in range(1, 6)],
                   redis=Redis(host=f"{env('redis_host')}"),
                   user_db=env("user"),
