@@ -40,7 +40,7 @@ async def process_place_command(message: Message, state: FSMContext):
     await state.set_state(FSMFinishShift.place)
 
 
-@router_finish.message(StateFilter(FSMFinishShift.place), F.text in config.places)
+@router_finish.message(StateFilter(FSMFinishShift.place), F.text)
 async def process_finish_start_command(message: Message, state: FSMContext):
     await state.update_data(place=message.text)
     await message.answer(text="Сколько было посетителей за сегодня? (Пришлите ответ числом)",

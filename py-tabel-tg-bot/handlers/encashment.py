@@ -31,7 +31,7 @@ async def process_place_command(message: Message, state: FSMContext):
                          reply_markup=await create_places_kb())
 
 
-@router_encashment.message(StateFilter(FSMEncashment.place), F.text in config.config.config.places)
+@router_encashment.message(StateFilter(FSMEncashment.place), F.text)
 async def process_photo_of_check_command(message: Message, state: FSMContext):
     await state.update_data(place=message.text)
     await message.answer(text="Пожалуйста, пришлите сюда фото чека инкассации\n\n"
