@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from aiogram import Router, F
-from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto
+from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto, InputMediaVideo
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.filters import StateFilter, Command
@@ -257,7 +257,9 @@ async def warning_charge_command(message: Message):
 @router_finish.message(StateFilter(FSMFinishShift.charge_video))
 async def process_charge_video_command(message: Message, state: FSMContext):
     if message.video:
-        await state.update_data(charge_video=message.video.file_id)
+        if 'charge_video' not in await state.get_data():
+            await state.update_data(charge_video=[message.video.file_id])
+
         finish_shift_dict = await state.get_data()
 
         day_of_week = datetime.now().strftime('%A')
@@ -278,13 +280,16 @@ async def process_charge_video_command(message: Message, state: FSMContext):
                                                caption="Чеки и необходимые фото за смену" if i == 0 else "")
                                for i, photo_file_id in enumerate(finish_shift_dict['necessary_photos'])]
 
+            video_necessary = [InputMediaVideo(media=video_file_id,
+                                               caption="Видео аккумулятора и внешнего вида поезда" if i == 0 else "")
+                               for i, video_file_id in enumerate(finish_shift_dict['charge_video'])]
+
             await message.bot.send_message(chat_id=place_chat[finish_shift_dict['place']],
                                            text=await report(finish_shift_dict, date=date))
             await message.bot.send_media_group(chat_id=place_chat[finish_shift_dict['place']],
                                                media=media_necessary)
-            await message.bot.send_video(chat_id=place_chat[finish_shift_dict['place']],
-                                         video=finish_shift_dict['charge_video'],
-                                         caption="Видео аккумулятора и внешнего вида поезда")
+            await message.bot.send_media_group(chat_id=place_chat[finish_shift_dict['place']],
+                                               media=video_necessary)
 
             db.DB.set_data(
                 user_id=message.from_user.id,

@@ -1,5 +1,3 @@
-import logging
-
 from aiogram.types import Message
 from aiogram import Router, F
 from aiogram.filters import Command, StateFilter

@@ -93,4 +93,7 @@ class AlbumsMiddleware(BaseMiddleware):
         if str(await data["state"].get_state()).split(":")[-1] == "necessary_photos":
             await data["state"].update_data(necessary_photos=[photo.photo[-1].file_id for photo in context.album])
 
+        if str(await data["state"].get_state()).split(":")[-1] == "charge_video":
+            await data["state"].update_data(charge_video=[video.video.file_id for video in context.album])
+
         return await handler(event, data)
